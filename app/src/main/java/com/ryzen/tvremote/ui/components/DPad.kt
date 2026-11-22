@@ -211,6 +211,24 @@ fun DPad(
     }
 }
 
+@androidx.compose.ui.tooling.preview.Preview
+@Composable
+private fun DPadPreview() {
+    com.ryzen.tvremote.ui.theme.TVRemoteTheme {
+        androidx.compose.foundation.layout.Box(
+            modifier = Modifier
+                .size(300.dp)
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = androidx.compose.ui.Alignment.Center
+        ) {
+            DPad(
+                onKey = { _, _ -> },
+                modifier = Modifier.size(280.dp)
+            )
+        }
+    }
+}
+
 @Composable
 private fun Chevron(icon: ImageVector, description: String, active: Boolean, modifier: Modifier) {
     val scheme = MaterialTheme.colorScheme

@@ -351,3 +351,24 @@ private fun MenuItem(
         onClick = onClick
     )
 }
+
+@androidx.compose.ui.tooling.preview.Preview
+@Composable
+private fun AppStripPreview() {
+    com.ryzen.tvremote.ui.theme.TVRemoteTheme {
+        AppStrip(
+            shortcuts = listOf(
+                AppShortcut("1", "Netflix", "netflix", 0xFFE50914, "netflix"),
+                AppShortcut("2", "Prime Video", "primevideo", 0xFF00A8E1, "primevideo"),
+                AppShortcut("3", "YouTube", "youtube", 0xFFFF0033, "youtube"),
+                AppShortcut("4", "SonyLIV", "sonyliv", 0xFF121212, "sonyliv"),
+                AppShortcut("5", "ZEE5", "zee5", 0xFFFFFFFF, "zee5")
+            ),
+            onLaunch = {},
+            onAdd = {},
+            onEdit = {},
+            onMove = { _, _ -> },
+            onRemove = {}
+        )
+    }
+}
