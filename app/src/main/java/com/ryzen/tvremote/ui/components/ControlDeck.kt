@@ -83,8 +83,24 @@ fun ControlDeck(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            NavKey(Icons.AutoMirrored.Rounded.ArrowBack, "Back", enabled, Modifier.weight(1f)) { onKey(RemoteKey.BACK) }
-            NavKey(Icons.Rounded.Home, "Home", enabled, Modifier.weight(1f)) { onKey(RemoteKey.HOME) }
+            IconSurface(
+                icon = Icons.AutoMirrored.Rounded.ArrowBack,
+                description = "Back",
+                onClick = { onKey(RemoteKey.BACK) },
+                size = KeyHeight,
+                iconSize = 26.dp,
+                enabled = enabled,
+                modifier = Modifier.weight(1f)
+            )
+            IconSurface(
+                icon = Icons.Rounded.Home,
+                description = "Home",
+                onClick = { onKey(RemoteKey.HOME) },
+                size = KeyHeight,
+                iconSize = 26.dp,
+                enabled = enabled,
+                modifier = Modifier.weight(1f)
+            )
             IconSurface(
                 icon = Icons.Rounded.Mic,
                 description = "Voice search",
@@ -93,19 +109,20 @@ fun ControlDeck(
                 iconSize = 28.dp,
                 color = scheme.primary,
                 contentColor = scheme.onPrimary,
-                enabled = enabled
+                enabled = enabled,
+                modifier = Modifier.weight(1f)
             )
             PressSurface(
                 onClick = { onKey(RemoteKey.MEDIA_PLAY_PAUSE) },
                 modifier = Modifier
-                    .width(KeyHeight + 12.dp)
+                    .weight(1.2f)
                     .height(KeyHeight),
                 color = scheme.primaryContainer,
                 contentColor = scheme.onPrimaryContainer,
                 enabled = enabled,
                 description = "Play or pause"
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                     Icon(Icons.Rounded.PlayArrow, null, modifier = Modifier.size(24.dp))
                     Icon(Icons.Rounded.Pause, null, modifier = Modifier.size(24.dp).offset(x = (-5).dp))
                 }
@@ -137,27 +154,6 @@ fun ControlDeck(
                 iconSize = 26.dp,
                 enabled = enabled
             )
-        }
-    }
-}
-
-@Composable
-private fun NavKey(
-    icon: ImageVector,
-    label: String,
-    enabled: Boolean,
-    modifier: Modifier,
-    onClick: () -> Unit
-) {
-    PressSurface(
-        onClick = onClick,
-        modifier = modifier.height(KeyHeight),
-        enabled = enabled,
-        description = label
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
-            Text(label, style = MaterialTheme.typography.titleMedium, maxLines = 1)
         }
     }
 }

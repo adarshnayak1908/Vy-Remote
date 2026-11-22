@@ -3,7 +3,6 @@ package com.ryzen.tvremote.ui.components
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -33,12 +32,15 @@ import com.ryzen.tvremote.protocol.KeyDirection
 import com.ryzen.tvremote.ui.theme.Motion
 import com.ryzen.tvremote.ui.theme.RemoteTheme
 
+import androidx.compose.material.icons.rounded.GridView
+
 @Composable
 fun TopBar(
     status: ConnectionStatus,
     deviceName: String,
     hasTv: Boolean,
     onDevicePickerClick: () -> Unit,
+    onAppsDrawerClick: () -> Unit,
     onPowerKey: (KeyDirection) -> Unit,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -46,69 +48,50 @@ fun TopBar(
     val scheme = MaterialTheme.colorScheme
     val connected = status is ConnectionStatus.Connected
 
-    val statusLabel = when (status) {
-        is ConnectionStatus.Connected -> "Connected"
-        is ConnectionStatus.Connecting -> "Connecting…"
-        is ConnectionStatus.NeedsPairing -> "Waiting for code"
-        is ConnectionStatus.Error -> "Can't connect"
-        is ConnectionStatus.Disconnected -> if (hasTv) "Not connected" else "Tap to choose"
-    }
-    val statusColor by animateColorAsState(
-        targetValue = when (status) {
-            is ConnectionStatus.Connected -> RemoteTheme.status.success
-            is ConnectionStatus.Connecting, is ConnectionStatus.NeedsPairing -> RemoteTheme.status.warning
-            is ConnectionStatus.Error -> scheme.error
-            is ConnectionStatus.Disconnected -> scheme.onSurfaceVariant
-        },
-        animationSpec = Motion.effects(),
-        label = "statusColor"
-    )
-
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // TV Devices Drawer button (TV icon with status indicator)
         PressSurface(
             onClick = onDevicePickerClick,
+            modifier = Modifier.size(60.dp),
+            description = "TV Devices. ${if (hasTv) deviceName else "No TV"}"
+        ) {
+            StatusBadge(status)
+        }
+
+        // Apps Drawer button (Grid icon + "Apps")
+        PressSurface(
+            onClick = onAppsDrawerClick,
             modifier = Modifier
-                .weight(1f)
-                .height(60.dp),
-            description = "Choose TV. ${if (hasTv) deviceName else "No TV"}, $statusLabel"
+                .height(60.dp)
+                .padding(horizontal = 4.dp),
+            description = "Streaming Apps"
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(start = 9.dp, end = 14.dp),
-                verticalAlignment = Alignment.CenterVertically
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                StatusBadge(status)
-                Spacer(Modifier.width(12.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = if (hasTv) deviceName else "No TV yet",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = scheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                    Text(
-                        text = statusLabel,
-                        style = MaterialTheme.typography.labelMedium,
-                        color = statusColor,
-                        maxLines = 1
-                    )
-                }
                 Icon(
-                    imageVector = Icons.Rounded.UnfoldMore,
+                    imageVector = Icons.Rounded.GridView,
                     contentDescription = null,
-                    tint = scheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
+                    tint = scheme.onSurface,
+                    modifier = Modifier.size(22.dp)
+                )
+                Text(
+                    text = "Apps",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = scheme.onSurface
                 )
             }
         }
+
+        Spacer(Modifier.weight(1f))
 
         // Tap toggles power; hold for the TV's power menu.
         HoldableKey(
@@ -174,5 +157,21 @@ private fun StatusBadge(status: ConnectionStatus) {
                 modifier = Modifier.size(20.dp)
             )
         }
+    }
+}
+
+@androidx.compose.ui.tooling.preview.Preview
+@Composable
+private fun TopBarPreview() {
+    com.ryzen.tvremote.ui.theme.TVRemoteTheme {
+        TopBar(
+            status = com.ryzen.tvremote.protocol.ConnectionStatus.Connected("192.168.1.100", "Vicky-TV"),
+            deviceName = "Vicky-TV",
+            hasTv = true,
+            onDevicePickerClick = {},
+            onAppsDrawerClick = {},
+            onPowerKey = {},
+            onSettingsClick = {}
+        )
     }
 }

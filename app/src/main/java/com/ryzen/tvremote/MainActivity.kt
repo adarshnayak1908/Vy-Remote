@@ -1,5 +1,6 @@
 package com.ryzen.tvremote
 
+import com.ryzen.tvremote.ui.components.AppsDrawerSheet
 import com.ryzen.tvremote.ui.components.VoicePanel
 import com.ryzen.tvremote.ui.VoiceUi
 import androidx.compose.runtime.key
@@ -182,6 +183,7 @@ fun TVRemoteScreen(viewModel: MainViewModel) {
     val showTutorial by viewModel.showTutorial.collectAsState()
     val availableUpdate by viewModel.availableUpdate.collectAsState()
 
+    var showAppsDrawer by remember { mutableStateOf(false) }
     var showAddApp by remember { mutableStateOf(false) }
     var editingApp by remember { mutableStateOf<AppShortcut?>(null) }
 
@@ -233,6 +235,7 @@ fun TVRemoteScreen(viewModel: MainViewModel) {
             deviceName = deviceName,
             hasTv = hasTv,
             onDevicePickerClick = { viewModel.showDevicePicker.value = true },
+            onAppsDrawerClick = { showAppsDrawer = true },
             onPowerKey = { direction -> viewModel.sendKey(RemoteKey.POWER, direction) },
             onSettingsClick = { viewModel.showSettings.value = true }
         )
@@ -379,6 +382,19 @@ fun TVRemoteScreen(viewModel: MainViewModel) {
             deviceName = deviceName,
             onConfirm = { pin -> viewModel.finishPairing(pin) },
             onDismiss = { viewModel.showPinDialog.value = false }
+        )
+    }
+
+    if (showAppsDrawer) {
+        AppsDrawerSheet(
+            shortcuts = shortcuts,
+            enabled = connected,
+            onLaunch = { viewModel.launchApp(it) },
+            onAddApp = {
+                editingApp = null
+                showAddApp = true
+            },
+            onDismiss = { showAppsDrawer = false }
         )
     }
 
