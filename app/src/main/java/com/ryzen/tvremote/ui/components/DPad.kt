@@ -68,8 +68,7 @@ fun DPad(
     val scheme = MaterialTheme.colorScheme
     val okDown = pressed == RemoteKey.DPAD_CENTER
 
-    // OK: cookie relaxes into a circle, shrinks and twists while held.
-    val okMorph = animateFloatAsState(if (okDown) 1f else 0f, Motion.fastSpatial(), label = "okMorph")
+    // OK: button shrinks when pressed or held.
     val okScale = animateFloatAsState(
         targetValue = when {
             okLong -> 0.84f
@@ -190,18 +189,16 @@ fun DPad(
         Chevron(Icons.Rounded.KeyboardArrowLeft, "Left", pressed == RemoteKey.DPAD_LEFT, Modifier.align(Alignment.CenterStart))
         Chevron(Icons.Rounded.KeyboardArrowRight, "Right", pressed == RemoteKey.DPAD_RIGHT, Modifier.align(Alignment.CenterEnd))
 
-        MorphBox(
-            from = Polygons.Cookie,
-            to = Polygons.Circle,
-            progress = { okMorph.value },
-            rotation = { okMorph.value * 22.5f },
-            color = okColor,
+        Box(
             modifier = Modifier
                 .size(OkSize)
                 .graphicsLayer {
                     scaleX = okScale.value
                     scaleY = okScale.value
                 }
+                .clip(CircleShape)
+                .background(okColor),
+            contentAlignment = Alignment.Center
         ) {
             Text(
                 text = "OK",

@@ -16,7 +16,7 @@ data class AppUpdateInfo(
 
 object UpdateChecker {
     private const val TAG = "UpdateChecker"
-    private const val GITHUB_API_URL = "https://api.github.com/repos/souravkl11/android-tv-remote/releases/latest"
+    private const val GITHUB_API_URL = "https://api.github.com/repos/adarshnayak1908/Vy-Remote/releases/latest"
 
     suspend fun checkForUpdate(currentVersionName: String): AppUpdateInfo? = withContext(Dispatchers.IO) {
         try {

@@ -40,9 +40,11 @@ data class AppPreset(
 
 object AppPresets {
     val all: List<AppPreset> = listOf(
-        AppPreset("youtube", "YouTube", "https://www.youtube.com", 0xFFFF0033),
         AppPreset("netflix", "Netflix", "https://www.netflix.com/title", 0xFFE50914),
-        AppPreset("primevideo", "Prime Video", "https://app.primevideo.com", 0xFF1A98FF),
+        AppPreset("primevideo", "Prime Video", "https://app.primevideo.com", 0xFF00A8E1),
+        AppPreset("youtube", "YouTube", "https://www.youtube.com", 0xFFFF0033),
+        AppPreset("sonyliv", "SonyLIV", "market://launch?id=com.sonyliv", 0xFF121212),
+        AppPreset("zee5", "ZEE5", "market://launch?id=com.graymatrix.did", 0xFFFFFFFF),
         AppPreset("spotify", "Spotify", "spotify://", 0xFF1DB954),
         AppPreset("disneyplus", "Disney+", "https://www.disneyplus.com", 0xFF113CCF),
         AppPreset("ytmusic", "YT Music", "https://music.youtube.com", 0xFFD32F2F),
@@ -51,7 +53,7 @@ object AppPresets {
         AppPreset("kodi", "Kodi", "market://launch?id=org.xbmc.kodi", 0xFF17B2E7)
     )
 
-    val defaultIds = listOf("youtube", "netflix", "primevideo", "spotify")
+    val defaultIds = listOf("netflix", "primevideo", "youtube", "sonyliv", "zee5")
 
     /** Swatches offered when creating a custom app. */
     val swatches: List<Long> = listOf(
@@ -98,15 +100,24 @@ class AppShortcutRepository(private val prefs: SharedPreferences) {
 
     companion object {
         private const val KEY_SHORTCUTS = "app_shortcuts"
+        private const val KEY_VERSION = "app_shortcuts_version"
+        private const val CURRENT_VERSION = 2
     }
 
     private val _shortcuts = MutableStateFlow(load())
     val shortcuts: StateFlow<List<AppShortcut>> = _shortcuts.asStateFlow()
 
     private fun load(): List<AppShortcut> {
+        val version = prefs.getInt(KEY_VERSION, 0)
+        if (version < CURRENT_VERSION) {
+            val seeded = AppPresets.defaultIds.mapNotNull { id -> AppPresets.all.find { it.id == id }?.toShortcut() }
+            persist(seeded)
+            prefs.edit().putInt(KEY_VERSION, CURRENT_VERSION).apply()
+            return seeded
+        }
         val json = prefs.getString(KEY_SHORTCUTS, null)
         if (json == null) {
-            val seeded = AppPresets.all.filter { it.id in AppPresets.defaultIds }.map { it.toShortcut() }
+            val seeded = AppPresets.defaultIds.mapNotNull { id -> AppPresets.all.find { it.id == id }?.toShortcut() }
             persist(seeded)
             return seeded
         }

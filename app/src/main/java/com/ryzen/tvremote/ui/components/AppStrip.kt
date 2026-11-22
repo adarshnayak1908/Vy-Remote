@@ -37,6 +37,10 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.vector.PathParser
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,44 +65,157 @@ fun AppTileIcon(
     size: Dp = 60.dp,
     presetId: String? = null
 ) {
-    val pathData = presetId?.let { BrandIcons.paths[it] }
-    val glyph = remember(pathData) {
-        pathData?.let { PathParser().parsePathString(it).toPath() }
-    }
-    // Netflix's mark is red on black, so it's inverted compared to the other brand tiles.
-    val redOnBlack = presetId == "netflix"
-    val onBrand = when {
-        redOnBlack -> Color(0xFFE50914)
-        color.luminance() > 0.6f -> Color(0xFF1E2025)
-        else -> Color.White
-    }
-    val fill = if (redOnBlack) {
-        Brush.verticalGradient(listOf(Color(0xFF1C1C1C), Color.Black))
-    } else {
-        Brush.verticalGradient(listOf(lerp(color, Color.White, 0.22f), color))
-    }
-
-    Box(
-        modifier = modifier
-            .size(size)
-            .clip(CircleShape)
-            .background(fill),
-        contentAlignment = Alignment.Center
-    ) {
-        if (glyph != null) {
-            Canvas(modifier = Modifier.size(size * 0.56f)) {
-                val scale = this.size.minDimension / 24f
-                withTransform({ scale(scale, scale, pivot = Offset.Zero) }) {
-                    drawPath(glyph, onBrand)
+    when (presetId) {
+        "zee5" -> {
+            Box(
+                modifier = modifier
+                    .size(size)
+                    .clip(CircleShape)
+                    .background(Color.White)
+                    .drawBehind {
+                        val strokeWidth = this.size.minDimension * 0.06f
+                        val inset = strokeWidth / 2f
+                        val arcSize = Size(this.size.width - strokeWidth, this.size.height - strokeWidth)
+                        val topLeft = Offset(inset, inset)
+                        drawArc(
+                            color = Color(0xFF00C853),
+                            startAngle = 135f,
+                            sweepAngle = 120f,
+                            useCenter = false,
+                            topLeft = topLeft,
+                            size = arcSize,
+                            style = Stroke(width = strokeWidth)
+                        )
+                        drawArc(
+                            color = Color(0xFFE040FB),
+                            startAngle = 315f,
+                            sweepAngle = 120f,
+                            useCenter = false,
+                            topLeft = topLeft,
+                            size = arcSize,
+                            style = Stroke(width = strokeWidth)
+                        )
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = "ZEE5",
+                    color = Color.Black,
+                    fontSize = (size.value * 0.28f).sp,
+                    fontWeight = FontWeight.Black,
+                    letterSpacing = (-0.5).sp
+                )
+            }
+        }
+        "sonyliv" -> {
+            Box(
+                modifier = modifier
+                    .size(size)
+                    .clip(CircleShape)
+                    .background(Color(0xFF0D0D14))
+                    .drawBehind {
+                        val strokeWidth = this.size.minDimension * 0.1f
+                        val inset = strokeWidth / 2f
+                        val arcSize = Size(this.size.width - strokeWidth, this.size.height - strokeWidth)
+                        val topLeft = Offset(inset, inset)
+                        drawArc(
+                            brush = Brush.horizontalGradient(
+                                listOf(Color(0xFFFF9100), Color(0xFFFF1744), Color(0xFFD500F9))
+                            ),
+                            startAngle = 200f,
+                            sweepAngle = 140f,
+                            useCenter = false,
+                            topLeft = topLeft,
+                            size = arcSize,
+                            style = Stroke(width = strokeWidth)
+                        )
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "SONY",
+                        color = Color.White,
+                        fontSize = (size.value * 0.22f).sp,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = (size.value * 0.22f).sp
+                    )
+                    Text(
+                        text = "liv",
+                        color = Color(0xFFFFAB00),
+                        fontSize = (size.value * 0.26f).sp,
+                        fontWeight = FontWeight.Black,
+                        lineHeight = (size.value * 0.26f).sp
+                    )
                 }
             }
-        } else {
-            Text(
-                text = appInitials(name),
-                color = onBrand,
-                fontSize = (size.value * 0.4f).sp,
-                fontWeight = FontWeight.Bold
-            )
+        }
+        "primevideo" -> {
+            Box(
+                modifier = modifier
+                    .size(size)
+                    .clip(CircleShape)
+                    .background(Color(0xFF00A8E1)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "prime",
+                        color = Color.White,
+                        fontSize = (size.value * 0.22f).sp,
+                        fontWeight = FontWeight.Bold,
+                        lineHeight = (size.value * 0.22f).sp
+                    )
+                    Text(
+                        text = "video",
+                        color = Color.White,
+                        fontSize = (size.value * 0.22f).sp,
+                        fontWeight = FontWeight.Black,
+                        lineHeight = (size.value * 0.26f).sp
+                    )
+                }
+            }
+        }
+        else -> {
+            val pathData = presetId?.let { BrandIcons.paths[it] }
+            val glyph = remember(pathData) {
+                pathData?.let { PathParser().parsePathString(it).toPath() }
+            }
+            val redOnBlack = presetId == "netflix"
+            val onBrand = when {
+                redOnBlack -> Color(0xFFE50914)
+                color.luminance() > 0.6f -> Color(0xFF1E2025)
+                else -> Color.White
+            }
+            val fill = if (redOnBlack) {
+                Brush.verticalGradient(listOf(Color(0xFF1C1C1C), Color.Black))
+            } else {
+                Brush.verticalGradient(listOf(lerp(color, Color.White, 0.22f), color))
+            }
+
+            Box(
+                modifier = modifier
+                    .size(size)
+                    .clip(CircleShape)
+                    .background(fill),
+                contentAlignment = Alignment.Center
+            ) {
+                if (glyph != null) {
+                    Canvas(modifier = Modifier.size(size * 0.56f)) {
+                        val scale = this.size.minDimension / 24f
+                        withTransform({ scale(scale, scale, pivot = Offset.Zero) }) {
+                            drawPath(glyph, onBrand)
+                        }
+                    }
+                } else {
+                    Text(
+                        text = appInitials(name),
+                        color = onBrand,
+                        fontSize = (size.value * 0.4f).sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
     }
 }
